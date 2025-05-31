@@ -31,20 +31,39 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-Future<bool> signup(String email, String password) async {
-  try {
-    final url = Uri.parse('$baseUrl/users/signup');
-    final response = await http.post(
+  Future<List<dynamic>> fetchInstitutions() async {
+    final url = Uri.parse('$baseUrl/belvos/institutions');
+    final response = await http.get(
       url,
-      body: json.encode({"email": email, "password": password}),
-      headers: {"Content-Type": "application/json"},
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer $_token",
+      },
     );
 
-    if (response.statusCode == 201) {
-      return true;
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      return data['results'];
+    } else {
+      throw Exception('Error al obtener instituciones');
     }
-    return false;
-  } catch (e) {
+  }
+
+  Future<bool> signup(String email, String password) async {
+  final url = Uri.parse('$baseUrl/users/signup');
+  final response = await http.post(
+    url,
+    body: json.encode({"email": email, "password": password}),
+    headers: {"Content-Type": "application/json"},
+  );
+
+  if (response.statusCode == 201) {
+    final data = json.decode(response.body);
+    _user = User.fromJson(data['user']); // opcional, si devuelves el user
+    _token = data['token']; // si también te devuelven el token
+    notifyListeners();
+    return true;
+  } else {
     return false;
   }
 }
@@ -54,4 +73,4 @@ Future<bool> signup(String email, String password) async {
     _token = null;
     notifyListeners();
   }
-}
+} 
