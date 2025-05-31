@@ -87,6 +87,24 @@ Future<List<dynamic>> fetchAccounts(String bankName) async {
   }
 }
 
+Future<Map<String, dynamic>> fetchTransactions(String accountId) async {
+  final url = Uri.parse('$baseUrl/belvos/transactions');
+  final response = await http.post(
+    url,
+    body: json.encode({"account_id": accountId}),
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer $_token",
+    },
+  );
+
+  if (response.statusCode == 200) {
+    return json.decode(response.body);
+  } else {
+    throw Exception('Error al obtener transacciones');
+  }
+}
+
   void logout() {
     _user = null;
     _token = null;

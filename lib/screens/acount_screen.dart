@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_provider.dart';
+import 'transaction_screen.dart'; 
 
 class AccountScreen extends StatefulWidget {
   final String bankName;
@@ -43,8 +44,15 @@ class _AccountScreenState extends State<AccountScreen> {
               final acc = accounts[index];
               return ListTile(
                 title: Text(acc['name']),
-                subtitle: Text('Saldo: \$${acc['balance']}'),
                 trailing: Text(acc['type']),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => TransactionScreen(accountId: acc['account_id']),
+                    ),
+                  );
+                },
               );
             },
           );
