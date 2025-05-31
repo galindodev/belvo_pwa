@@ -1,4 +1,3 @@
-import 'package:belvo_pwa/screens/home_screens.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_provider.dart';
@@ -44,7 +43,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     obscureText: true,
                     onChanged: (value) => password = value,
                     validator:
-                        (value) => value!.isEmpty ? 'Enter your password' : null,
+                        (value) =>
+                            value!.isEmpty ? 'Enter your password' : null,
                   ),
                   const SizedBox(height: 24),
                   FilledButton(
@@ -56,17 +56,21 @@ class _LoginScreenState extends State<LoginScreen> {
                         );
                         if (success) {
                           try {
-                            final instituciones = await authProvider.fetchInstitutions();
+                            final instituciones =
+                                await authProvider.fetchInstitutions();
                             if (!context.mounted) return;
-                            Navigator.pushReplacement(
+                            Navigator.pushReplacementNamed(
                               context,
-                              MaterialPageRoute(
-                                builder: (_) => HomeScreen(institutions: instituciones),
-                              ),
+                              '/home',
+                              arguments: instituciones,
                             );
                           } catch (e) {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Error obteniendo instituciones: $e')),
+                              SnackBar(
+                                content: Text(
+                                  'Error obteniendo instituciones: $e',
+                                ),
+                              ),
                             );
                           }
                         } else {
@@ -84,6 +88,14 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                     child: const Text('No tienes cuenta? Regístrate'),
                   ),
+                  SizedBox(
+                    height: 50,
+                  ),
+                  Text('Powered by Jhorman Galindo :D',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey[600],
+                      )),
                 ],
               ),
             ),

@@ -59,12 +59,31 @@ class AuthProvider with ChangeNotifier {
 
   if (response.statusCode == 201) {
     final data = json.decode(response.body);
-    _user = User.fromJson(data['user']); // opcional, si devuelves el user
-    _token = data['token']; // si también te devuelven el token
+    _user = User.fromJson(data['user']); 
+    _token = data['token']; 
     notifyListeners();
     return true;
   } else {
     return false;
+  }
+}
+
+Future<List<dynamic>> fetchAccounts(String bankName) async {
+  final url = Uri.parse('$baseUrl/belvos/accounts');
+  final response = await http.post(
+    url,
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer $_token",
+    },
+    body: json.encode({"bank_name": bankName}),
+  );
+
+  if (response.statusCode == 200) {
+    final data = json.decode(response.body);
+    return data;
+  } else {
+    throw Exception('No se pudieron obtener las cuentas');
   }
 }
 

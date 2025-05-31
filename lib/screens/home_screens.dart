@@ -38,11 +38,18 @@ class HomeScreen extends StatelessWidget {
             child: Card(
               elevation: 2,
               child: ListTile(
+                onTap: () {
+                  Navigator.pushNamed(
+                    context,
+                    '/accounts',
+                    arguments: inst['name'],
+                  );
+                },
                 leading: SvgPicture.network(
                   inst['icon_logo'],
                   width: 40,
-                  placeholderBuilder: (_) =>
-                      const CircularProgressIndicator(strokeWidth: 2),
+                  placeholderBuilder:
+                      (_) => const CircularProgressIndicator(strokeWidth: 2),
                 ),
                 title: Text(inst['display_name']),
                 subtitle: Text(inst['name']),
