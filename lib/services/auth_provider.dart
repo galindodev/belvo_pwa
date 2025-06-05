@@ -12,24 +12,27 @@ class AuthProvider with ChangeNotifier {
   User? get user => _user;
   String? get token => _token;
 
-  Future<bool> login(String email, String password) async {
-    final url = Uri.parse('$baseUrl/users/auth');
-    final response = await http.post(
-      url,
-      body: json.encode({"email": email, "password": password}),
-      headers: {"Content-Type": "application/json"},
-    );
+Future<Map<String, dynamic>> login(String email, String password) async {
+  final url = Uri.parse('$baseUrl/users/auth');
+  final response = await http.post(
+    url,
+    body: json.encode({"email": email, "password": password}),
+    headers: {"Content-Type": "application/json"},
+  );
 
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      _user = User.fromJson(data['user']);
-      _token = data['token'];
-      notifyListeners();
-      return true;
-    } else {
-      return false;
-    }
+  final data = json.decode(response.body);
+
+  if (response.statusCode == 200) {
+    _user = User.fromJson(data['user']);
+    _token = data['token'];
+    notifyListeners();
   }
+
+  return {
+    'status': response.statusCode,
+    'mssg': data['mssg'] ?? 'Error desconocido'
+  };
+}
 
   Future<List<dynamic>> fetchInstitutions() async {
     final url = Uri.parse('$baseUrl/belvos/institutions');

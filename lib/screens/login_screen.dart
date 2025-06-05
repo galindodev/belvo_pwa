@@ -47,41 +47,31 @@ class _LoginScreenState extends State<LoginScreen> {
                             value!.isEmpty ? 'Enter your password' : null,
                   ),
                   const SizedBox(height: 24),
-                  FilledButton(
-                    onPressed: () async {
-                      if (_formKey.currentState!.validate()) {
-                        final success = await authProvider.login(
-                          email,
-                          password,
-                        );
-                        if (success) {
-                          try {
-                            final instituciones =
-                                await authProvider.fetchInstitutions();
-                            if (!context.mounted) return;
-                            Navigator.pushReplacementNamed(
-                              context,
-                              '/home',
-                              arguments: instituciones,
-                            );
-                          } catch (e) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  'Error obteniendo instituciones: $e',
-                                ),
-                              ),
-                            );
-                          }
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Login fallido')),
-                          );
-                        }
-                      }
-                    },
-                    child: const Text('Login'),
-                  ),
+                 FilledButton(
+  onPressed: () async {
+    if (_formKey.currentState!.validate()) {
+      final result = await authProvider.login(email, password);
+
+      if (!context.mounted) return;
+
+      if (result['status'] == 200) {
+        try {
+          final instituciones = await authProvider.fetchInstitutions();
+          Navigator.pushReplacementNamed(
+            context,
+            '/home',
+            arguments: instituciones,
+          );
+        } catch (e) {
+          _showSnackBar('Error al obtener instituciones: $e');
+        }
+      } else {
+        _showSnackBar(result['mssg']);
+      }
+    }
+  },
+  child: const Text('Login'),
+),
                   TextButton(
                     onPressed: () {
                       Navigator.pushNamed(context, '/register');
@@ -104,4 +94,8 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
+
+  void _showSnackBar(String message) {
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+}
 }
