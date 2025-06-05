@@ -4,8 +4,13 @@ import '../services/auth_provider.dart';
 
 class TransactionScreen extends StatefulWidget {
   final String accountId;
+  final String linkId;
 
-  const TransactionScreen({super.key, required this.accountId});
+  const TransactionScreen({
+    super.key,
+    required this.accountId,
+    required this.linkId,
+  });
 
   @override
   State<TransactionScreen> createState() => _TransactionScreenState();
@@ -18,7 +23,7 @@ class _TransactionScreenState extends State<TransactionScreen> {
   void initState() {
     super.initState();
     _transactionFuture = Provider.of<AuthProvider>(context, listen: false)
-        .fetchTransactions(widget.accountId);
+        .fetchTransactions(widget.accountId, widget.linkId);
   }
 
   @override
@@ -32,6 +37,8 @@ class _TransactionScreenState extends State<TransactionScreen> {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return const Center(child: Text('Error al cargar transacciones'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text('No hay transacciones disponibles'));
           }
 
           final data = snapshot.data!;
@@ -59,14 +66,18 @@ class _TransactionScreenState extends State<TransactionScreen> {
                   itemBuilder: (context, index) {
                     final tx = transacciones[index];
                     return ListTile(
-                      leading: Image.network(
-                        tx['logo'],
-                        width: 40,
-                        errorBuilder: (_, __, ___) =>
-                            const Icon(Icons.image),
+                      leading: tx['logo'] != null
+                          ? Image.network(
+                              tx['logo'],
+                              width: 40,
+                              errorBuilder: (_, __, ___) =>
+                                  const Icon(Icons.transcribe_sharp),
+                            )
+                          : const Icon(Icons.account_balance_wallet),
+                      title: Text(tx['comercio'] ?? 'Sin comercio'),
+                      subtitle: Text(
+                        '${tx['descripcion'] ?? ''} - ${tx['fecha'] ?? ''}',
                       ),
-                      title: Text(tx['comercio']),
-                      subtitle: Text('${tx['descripcion']} - ${tx['fecha']}'),
                       trailing: Text(
                         '\$${tx['monto']}',
                         style: TextStyle(

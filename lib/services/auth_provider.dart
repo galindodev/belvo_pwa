@@ -87,23 +87,33 @@ Future<Map<String, dynamic>> login(String email, String password) async {
     }
   }
 
-  Future<Map<String, dynamic>> fetchTransactions(String accountId) async {
-    final url = Uri.parse('$baseUrl/belvos/transactions');
-    final response = await http.post(
-      url,
-      body: json.encode({"account_id": accountId}),
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer $_token",
-      },
-    );
+  Future<Map<String, dynamic>> fetchTransactions(String accountId, String linkId) async {
+  final url = Uri.parse('$baseUrl/belvos/transactions');
+  final response = await http.post(
+    url,
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $_token',
+    },
+    body: jsonEncode({
+      'account_id': accountId,
+      'link_id': linkId,
+    }),
+  );
 
-    if (response.statusCode == 200) {
-      return json.decode(response.body);
-    } else {
-      throw Exception('Error al obtener transacciones');
-    }
+  final data = jsonDecode(response.body);
+
+  if (response.statusCode == 200) {
+    return {
+      'ingresos': data['ingresos'],
+      'egresos': data['egresos'],
+      'kpi_balance': data['kpi_balance'],
+      'transacciones': data['transacciones'],
+    };
+  } else {
+    throw Exception(data['mssg'] ?? 'Error al obtener transacciones');
   }
+}
 
   void logout() {
     _user = null;

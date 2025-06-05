@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_provider.dart';
-import 'transaction_screen.dart'; 
+import 'transaction_screen.dart';
 
 class AccountScreen extends StatefulWidget {
   final String bankName;
@@ -33,7 +33,7 @@ class _AccountScreenState extends State<AccountScreen> {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return const Center(child: Text('Error al cargar las cuentas'));
-          } else if (snapshot.data!.isEmpty) {
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return const Center(child: Text('No hay cuentas disponibles'));
           }
 
@@ -42,14 +42,21 @@ class _AccountScreenState extends State<AccountScreen> {
             itemCount: accounts.length,
             itemBuilder: (context, index) {
               final acc = accounts[index];
+
+              final accountId = acc['account_id'];
+              final linkId = acc['link_id'];
+
               return ListTile(
-                title: Text(acc['name']),
-                trailing: Text(acc['type']),
+                title: Text(acc['name'] ?? 'Sin nombre'),
+                subtitle: Text('Tipo: ${acc['type']}'),
                 onTap: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => TransactionScreen(accountId: acc['account_id']),
+                      builder: (_) => TransactionScreen(
+                        accountId: accountId,
+                        linkId: linkId,
+                      ),
                     ),
                   );
                 },
