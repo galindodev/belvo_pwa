@@ -33,22 +33,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  Future<void> _submit(AuthProvider authProvider) async {
-    if (_formKey.currentState!.validate()) {
-      try {
-        final success = await authProvider.signup(email, password);
-        if (!context.mounted) return;
+ Future<void> _submit(AuthProvider authProvider) async {
+  if (_formKey.currentState!.validate()) {
+    try {
+      final result = await authProvider.signup(email, password);
+      if (!context.mounted) return;
 
-        if (success) {
-          _showSuccessDialog();
-        } else {
-          _showSnackBar('Error al registrar usuario');
-        }
-      } catch (e) {
-        _showSnackBar('Error al registrar: $e');
+      if (result['status'] == 201) {
+        _showSuccessDialog();
+      } else {
+        _showSnackBar(result['mssg']);
       }
+    } catch (e) {
+      _showSnackBar('Error al registrar: $e');
     }
   }
+}
 
   void _showSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
